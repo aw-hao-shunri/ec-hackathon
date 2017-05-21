@@ -1,5 +1,26 @@
+*/.classpath
+*/.project
+*/.gradle
+*/.settings
+*/work
+*/bin
+*/build
+*/src/main/webapp/WEB-INF/classes
+*/src/main/webapp/WEB-INF/lib
 *.class
-
+*/log
+*/logs
+**/*/*.log
+*/.sass-cache
+*/bower_components
+*/node_modules
+.classpath
+.project
+.gradle
+.settings
+*/src/main/webapp/WEB-INF/build_num.txt
+*/src/main/webapp/WEB-INF/branch_name.txt
+.metadata
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 

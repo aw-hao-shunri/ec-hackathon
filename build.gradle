@@ -1,0 +1,109 @@
+buildscript {
+  repositories {
+    maven { url 'https://plugins.gradle.org/m2/' }
+  }
+  dependencies {
+    classpath 'gradle.plugin.com.dorongold.plugins:task-tree:1.2.2'
+  }
+}
+apply plugin: 'com.dorongold.task-tree'
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'eclipse'
+    
+    tasks.withType(JavaCompile){ options.encoding = 'UTF-8' }
+    
+    repositories {
+        mavenCentral()
+        maven { url 'http://jasperreports.sourceforge.net/maven2/' }
+        maven { url 'http://jaspersoft.artifactoryonline.com/jaspersoft/third-party-ce-artifacts/' }
+    }
+    
+    dependencies {
+        // Spring Framework
+        compile 'org.springframework:spring-context:4.1.6.RELEASE'
+        compile 'org.springframework:spring-core:4.1.6.RELEASE'
+        compile 'org.springframework:spring-jdbc:4.1.6.RELEASE'
+        compile 'org.springframework:spring-beans:4.1.6.RELEASE'
+        compile 'org.springframework:spring-aop:4.1.6.RELEASE'
+        compile 'org.springframework:spring-test:4.1.6.RELEASE'
+        compile 'org.springframework:spring-oxm:4.1.6.RELEASE'
+        compile 'org.springframework:spring-context-support:4.1.6.RELEASE'
+        compile 'org.springframework:spring-tx:4.1.6.RELEASE'
+        compile 'org.springframework.session:spring-session:1.0.1.RELEASE'
+        
+         // Database
+        compile 'org.apache.commons:commons-dbcp2:2.0.1'
+        compile 'commons-dbcp:commons-dbcp:1.4'
+
+        // MyBatis
+        compile 'org.mybatis:mybatis:3.2.7'
+        compile 'org.mybatis:mybatis-spring:1.2.4'
+
+        // Logging
+        compile 'org.slf4j:slf4j-api:1.7.6'
+        compile 'org.slf4j:jcl-over-slf4j:1.7.6'
+        compile 'ch.qos.logback:logback-classic:1.1.1'
+        compile 'ch.qos.logback:logback-core:1.1.1'
+        compile ('org.codehaus.janino:janino:2.7.6') { exclude module: 'log4j' }
+
+        // Jackson
+        compile 'com.fasterxml.jackson.core:jackson-databind:2.3.3'
+        compile 'com.fasterxml.jackson.core:jackson-core:2.3.3'
+
+        // XML
+        compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.9'
+
+        // Aspect
+        compile 'org.aspectj:aspectjrt:1.7.4'
+        compile 'org.aspectj:aspectjweaver:1.7.4'
+
+        // Test
+        testCompile 'org.jmockit:jmockit:1.21'
+        testCompile 'junit:junit:4.11'
+        testCompile 'org.dbunit:dbunit:2.5.1'
+
+        // Mail
+        compile 'javax.mail:mail:1.4.7'
+        compile 'org.apache.velocity:velocity:1.7'
+
+        // Validate
+        compile 'org.hibernate:hibernate-validator:5.1.0.Final'
+        compile 'javax.el:javax.el-api:2.2.4'
+        compile 'org.glassfish.web:javax.el:2.2.4'
+
+        // HttpClient
+        compile 'org.apache.httpcomponents:httpclient:4.3.4'
+        // jsoup
+        compile 'org.jsoup:jsoup:1.10.1'
+        
+        compile fileTree(dir: new File(project(':common').projectDir, 'libs'), includes: ['*.jar'])
+    }
+    
+    eclipseJdt {
+        doLast {
+          File resourcesPrefs = file('.settings/org.eclipse.core.resources.prefs')
+          resourcesPrefs.write('eclipse.preferences.version=1\n')
+          resourcesPrefs.append('encoding/<project>=UTF-8')
+          File runtimePrefs = file('.settings/org.eclipse.core.runtime.prefs')
+          runtimePrefs.write('eclipse.preferences.version=1\n')
+          runtimePrefs.append('line.separator=\\n')
+        }
+    }
+
+    cleanEclipseJdt {
+    doLast {
+      file('.settings/org.eclipse.core.resources.prefs').delete()
+      file('.settings/org.eclipse.core.runtime.prefs').delete()
+    }
+    }
+
+    tasks.eclipse.dependsOn cleanEclipse
+    
+}
+//task allBuild(dependsOn: [':common:jar') {}
+                          
+ task wrapper(type: Wrapper) {
+  gradleVersion = '3.4.1'
+}
