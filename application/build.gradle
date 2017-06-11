@@ -1,0 +1,75 @@
+/*== 手元で開発するための一連のタスク群 =========================================*/
+
+// リソースファイルが置かれているディレクトリをクラスパスに追加する
+eclipse.classpath.file {
+  withXml {
+    def envDirs = ['dist_env/base', 'dist_env/local', 'test_env/local']
+    def node = it.asNode()
+    envDirs.each {
+      node.appendNode('classpathentry', [kind: 'src', path: "$it"])
+    }
+  }
+}
+
+// .projectファイルに、他のWTPプロジェクトから参照されるための設定を追加する
+eclipse.project.file.withXml {
+  it.asNode().children().each {
+    if (it.name() == 'natures') {
+      it.appendNode('nature', null, 'org.eclipse.wst.common.project.facet.core.nature')
+      it.appendNode('nature', null, 'org.eclipse.wst.common.modulecore.ModuleCoreNature')
+    } else if (it.name() == 'buildSpec') {
+      def bc = new Node(null, 'buildCommand')
+      bc.appendNode('name', null, 'org.eclipse.wst.common.project.facet.core.builder')
+      bc.appendNode('arguments')
+      it.append(bc)
+      def bc2 = new Node(null, 'buildCommand')
+      bc2.appendNode('name', null, 'org.eclipse.wst.validation.validationbuilder')
+      bc2.appendNode('arguments')
+      it.append(bc2)
+    }
+  }
+}
+
+// 他のWTPプロジェクトから参照されるために、.settings配下のファイルを作成する
+eclipseJdt.doLast {
+  def wstCommonComponent = new groovy.xml.MarkupBuilder(file('.settings/org.eclipse.wst.common.component').newWriter())
+  wstCommonComponent.setDoubleQuotes(true)
+  wstCommonComponent.mkp.xmlDeclaration(version: "1.0", encoding: "UTF-8")
+  wstCommonComponent.'project-modules'('id':'moduleCoreId', 'project-version':'1.5.0') {
+    'wb-module'('deploy-name':'common') {
+      'wb-resource'('deploy-path':'/', 'source-path':'/src/main/java')
+      'wb-resource'('deploy-path':'/', 'source-path':'/src/main/resources')
+      'wb-resource'('deploy-path':'/', 'source-path':'/src/test/java')
+      'wb-resource'('deploy-path':'/', 'source-path':'/src/test/resources')
+    }
+  }
+  def wstCommonProjectFacetCore = new groovy.xml.MarkupBuilder(file('.settings/org.eclipse.wst.common.project.facet.core.xml').newWriter())
+  wstCommonProjectFacetCore.setDoubleQuotes(true)
+  wstCommonProjectFacetCore.mkp.xmlDeclaration(version: "1.0", encoding: "UTF-8")
+  wstCommonProjectFacetCore.'faceted-project' {
+    'fixed'('facet':'java')
+    'fixed'('facet':'jst.utility')
+    'installed'('facet':'java', 'version':'1.8')
+    'installed'('facet':'jst.utility', 'version':'1.0')
+  }
+}
+
+// cleanEclipse実行時にきれいにする
+cleanEclipseJdt.doLast {
+  file('.settings/org.eclipse.wst.common.component').delete()
+  file('.settings/org.eclipse.wst.common.project.facet.core.xml').delete()
+}
+
+/*== GradleからJUnitを実行するためのリソースファイルデプロイタスク ===============*/
+
+task copyTestEnvFiles(dependsOn: testClasses, type: Copy) {
+  def env = project.hasProperty('env') ? project.property('env') : 'local'
+  from new File(project.projectDir, 'test_env/' + env)
+  into new File(project.buildDir, 'resources/test')
+}
+task copyTestMessageProperties(dependsOn: testClasses, type: Copy) {
+  from new File(project.projectDir, 'dist_env/base')
+  into new File(project.buildDir, 'resources/test')
+}
+test.dependsOn copyTestEnvFiles
+test.dependsOn copyTestMessageProperties
