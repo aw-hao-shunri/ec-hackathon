@@ -2,13 +2,13 @@
 
 // リソースファイルが置かれているディレクトリをクラスパスに追加する
 eclipse.classpath.file {
-  withXml {
+ /* withXml {
     def envDirs = ['dist_env/base', 'dist_env/local', 'test_env/local']
     def node = it.asNode()
     envDirs.each {
       node.appendNode('classpathentry', [kind: 'src', path: "$it"])
     }
-  }
+  }*/
 }
 
 // .projectファイルに、他のWTPプロジェクトから参照されるための設定を追加する
