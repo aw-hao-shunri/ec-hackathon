@@ -8,6 +8,7 @@ buildscript {
 }
 apply plugin: 'com.dorongold.task-tree'
 
+
 subprojects {
     apply plugin: 'java'
     apply plugin: 'eclipse'
@@ -79,6 +80,13 @@ subprojects {
         compile 'org.jsoup:jsoup:1.10.1'
         
         compile fileTree(dir: new File(project(':common').projectDir, 'libs'), includes: ['*.jar'])
+    }
+    
+    javadoc {
+    	options.charSet = 'UTF-8'
+    	options.encoding = 'UTF-8'
+    	title = "EC hackathon"
+    	description "EC hackathon JavaDoc."
     }
     
     eclipseJdt {
