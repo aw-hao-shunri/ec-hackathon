@@ -79,6 +79,9 @@ subprojects {
         // jsoup
         compile 'org.jsoup:jsoup:1.10.1'
         
+        // common
+        compile 'commons-io:commons-io:2.5'
+        
         compile fileTree(dir: new File(project(':common').projectDir, 'libs'), includes: ['*.jar'])
     }
     
